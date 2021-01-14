@@ -1,0 +1,30 @@
+{
+  "id": "2325786",
+  "name": "搜索logo",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "6811981",
+      "name": "google",
+      "font_class": "google",
+      "unicode": "e6da",
+      "unicode_decimal": 59098
+    },
+    {
+      "icon_id": "7750860",
+      "name": "bing",
+      "font_class": "bing",
+      "unicode": "e861",
+      "unicode_decimal": 59489
+    },
+    {
+      "icon_id": "12911220",
+      "name": "baidu",
+      "font_class": "baidu",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    }
+  ]
+}
