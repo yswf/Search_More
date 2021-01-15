@@ -1,10 +1,17 @@
 {
-  "id": "2325786",
-  "name": "搜索logo",
+  "id": "2328191",
+  "name": "search",
   "font_family": "iconfont",
   "css_prefix_text": "icon-",
   "description": "",
   "glyphs": [
+    {
+      "icon_id": "1039089",
+      "name": "sound",
+      "font_class": "sound",
+      "unicode": "e6dc",
+      "unicode_decimal": 59100
+    },
     {
       "icon_id": "6811981",
       "name": "google",
@@ -25,6 +32,34 @@
       "font_class": "baidu",
       "unicode": "e602",
       "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "1876920",
+      "name": "right",
+      "font_class": "right",
+      "unicode": "e664",
+      "unicode_decimal": 58980
+    },
+    {
+      "icon_id": "11906817",
+      "name": "set",
+      "font_class": "set",
+      "unicode": "e60d",
+      "unicode_decimal": 58893
+    },
+    {
+      "icon_id": "13612489",
+      "name": "left",
+      "font_class": "left",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "15337722",
+      "name": "Logo GitHub",
+      "font_class": "huaban88",
+      "unicode": "e67c",
+      "unicode_decimal": 59004
     }
   ]
 }

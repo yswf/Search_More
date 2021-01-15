@@ -11,22 +11,6 @@ ul{
     margin: 0;
     list-style: none;
 }
-body{
-    position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url("http://yswf.xyz/api") no-repeat;
-      -webkit-background-size: cover;
-      -moz-background-size: cover;
-      -o-background-size: cover;
-      background-size: cover;
-      background-position-x: center;
-      z-index: -99;
-      -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://yswf.xyz/api', sizingMethod='scale')";
-      filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://yswf.xyz/api', sizingMethod='scale');
-    }
 input::-webkit-input-placeholder { /* WebKit browsers */
     color: #ffffff;
     font-size: 14px;
