@@ -2,11 +2,12 @@ html,
 body,
 #app{
     height: 100%;
-    min-width: 500px;
+    min-width: 705px;
     padding: 0;
     margin: 0;
 }
-ul{
+ul,
+li{
     padding: 0;
     margin: 0;
     list-style: none;

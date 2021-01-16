@@ -56,17 +56,17 @@
     </ul>
     <div :class="showKeyworld">
       <div class="transfrom" @click.stop="playAuido">
-        翻译：{{ keyWorld }}<span class="iconfont icon-sound"></span>
+        翻译：{{ keyWorld }}<span class="iconfont icon-sound"> alt+/</span>
       </div>
       <ul v-for="(item, i) in getKeyList" :key="i">
         <li
           v-if="keyListActive === i"
           class="keyListActive"
-          @click="keyListSearch(item.q)"
+          @click.stop="keyListSearch(item.q)"
         >
           {{ item.q }}
         </li>
-        <li v-else @click="keyListSearch(item.q)">{{ item.q }}</li>
+        <li v-else @click.stop="keyListSearch(item.q)">{{ item.q }}</li>
       </ul>
     </div>
     <change></change>
@@ -78,11 +78,14 @@
 <script>
 import change from './components/Change'
 import setting from './components/Set'
+// 引入常量
+import { urls } from './partten'
 export default {
   components: { setting, change },
   data () {
     return {
       keyWorld: '',
+      transfromWorld: '',
       placeholder: 'Search',
       isFocus: false,
       getKeyList: [],
@@ -113,28 +116,28 @@ export default {
     baidu () {
       this.searchLogoActive = 0
       if (this.keyWorld.trim() !== '') {
-        window.open('https://www.baidu.com/s?ie=utf-8&word=' + this.keyWorld)
+        window.open(urls.baiduUrl + this.keyWorld)
       }
       this.keyWorld = ''
     },
     bing () {
       this.searchLogoActive = 1
       if (this.keyWorld.trim() !== '') {
-        window.open('https://cn.bing.com/search?q=' + this.keyWorld)
+        window.open(urls.bingUrl + this.keyWorld)
       }
       this.keyWorld = ''
     },
     google () {
       this.searchLogoActive = 2
       if (this.keyWorld.trim() !== '') {
-        window.open('https://txt.guoqiangti.ga/search?q=' + this.keyWorld)
+        window.open(urls.googleUrl + this.keyWorld)
       }
       this.keyWorld = ''
     },
     github () {
       this.searchLogoActive = 3
       if (this.keyWorld.trim() !== '') {
-        window.open('https://github.com/search?q=' + this.keyWorld)
+        window.open(urls.githubUrl + this.keyWorld)
       }
       this.keyWorld = ''
     },
@@ -146,6 +149,7 @@ export default {
         this.status = false
         timer = setTimeout(() => {
           this.getWorldKey()
+          this.audioUrl = urls.youdaoUrl + this.keyWorld
           this.status = true
         }, 500)
       } else {
@@ -154,9 +158,7 @@ export default {
     },
     // 获取关键词
     getWorldKey () {
-      const url =
-        'https://www.baidu.com/sugrec?pre=1&p=3&ie=utf-8&json=1&prod=pc&from=pc_web&wd=' +
-        this.keyWorld
+      const url = urls.baiduKeysUrl + this.keyWorld
       // jsonp方法会自动添加callback
       this.$jsonp(url, {}).then((json) => {
         // 返回的jsonp数据不会放这里，而是在 window.jsonpCallback
@@ -165,9 +167,10 @@ export default {
     },
     // 键盘事件
     keyupThen (e) {
+      if (e.altKey && (e.keyCode === 191 || e.keyCode === 229)) {
+        this.playAuido()
+      }
       const keys =
-        !e.altKey &&
-        e.keyCode !== 83 &&
         e.keyCode !== 13 &&
         e.keyCode !== 37 &&
         e.keyCode !== 39 &&
@@ -177,7 +180,7 @@ export default {
       if (keys) {
         return
       }
-      console.log(e.keyCode === 83 && e.altKey)
+      e.preventDefault()
       if (e.keyCode === 13) {
         this.searchLogoActive === 0 && this.baidu()
         this.searchLogoActive === 1 && this.bing()
@@ -216,26 +219,22 @@ export default {
         this.keyListActive++
         this.keyWorld = this.getKeyList[this.keyListActive].q
       }
-      // ctrl+s发声
-      if (e.altKey && e.keyCode === 83) {
-        console.log('激活了')
-        this.playAuido()
-      }
     },
     // 联想词条搜索
     keyListSearch (q) {
-      this.keyworld = q
+      this.keyWorld = q
       this.searchLogoActive === 0 && this.baidu()
       this.searchLogoActive === 1 && this.bing()
       this.searchLogoActive === 2 && this.google()
       this.searchLogoActive === 3 && this.github()
     },
     // 播放声音英文
-    async playAuido () {
-      this.audioUrl = ''
-      this.audioUrl =
-        'http://dict.youdao.com/dictvoice?type=0&audio=' + this.keyWorld
-      await this.$refs.audioRef.load()
+    playAuido () {
+      if (this.keyWorld.trim() === '') {
+        return
+      }
+      // await this.$refs.audioRef.load()
+      this.$message.success('即将阅读翻译！')
       this.$refs.audioRef.play()
     }
   },
@@ -276,15 +275,16 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: url("http://yswf.xyz/api") no-repeat;
+  background: url("https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg&amp;rf=LaDigue_1920x1080.jpg&amp;pid=hp")
+    no-repeat;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
   background-position-x: center;
   /* z-index: -99; */
-  -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://yswf.xyz/api', sizingMethod='scale')";
-  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://yswf.xyz/api', sizingMethod='scale');
+  -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg&amp;rf=LaDigue_1920x1080.jpg&amp;pid=hp', sizingMethod='scale')";
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg&amp;rf=LaDigue_1920x1080.jpg&amp;pid=hp', sizingMethod='scale');
 }
 /* .mkg {
   position: absolute;
@@ -316,6 +316,10 @@ export default {
   border-radius: 20px;
   transition: all 0.25s;
   cursor: pointer;
+}
+.searchTools li:hover{
+  color: #11111190;
+  transform: scale(1.1);
 }
 .default {
   position: absolute;
@@ -390,11 +394,10 @@ export default {
 }
 .show {
   display: block;
-  -webkit-backdrop-filter: blur(30px);
-  backdrop-filter: blur(30px);
 }
-.searchLogoActive {
-  color: rgba(255, 255, 255, 0.9);
+.searchTools .searchLogoActive {
+  /* color: rgba(255, 255, 255, 0.9); */
+  color: #111111;
   background-color: rgba(255, 255, 255, 0.5);
   box-shadow: rgba(0, 0, 0, 0.2) 0 0 10px;
   backdrop-filter: blur(10px);

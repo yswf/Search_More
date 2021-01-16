@@ -23,4 +23,8 @@ export default {
     font-size: 30px;
      cursor: pointer;
 }
+.icon-set:hover{
+  color: #11111190;
+   transform: scale(1.2);
+}
 </style>
