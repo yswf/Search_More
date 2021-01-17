@@ -34,6 +34,9 @@
           </template>
       </el-table-column>
     </el-table>
+    <el-row>
+      <el-col :span="4" :offset="18"> <el-link type="success" href="http://wpa.qq.com/msgrd?v=3&uin=1938268436&site=qq&menu=yes" target="_blank" :underline="false">点击联系我</el-link></el-col>
+  </el-row>
   <span slot="footer" >
     <el-button @click="setDialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="setDialogVisible = false">确 定</el-button>

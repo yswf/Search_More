@@ -9,8 +9,9 @@ module.exports = {
       // 使用externals设置排除项
       config.set('externals', {
         vue: 'Vue',
-        axios: 'axios'
-        // nprogress: 'NProgress',
+        axios: 'axios',
+        nprogress: 'NProgress',
+        'vue-jsonp': 'VueJsonp'
       })
 
       config.plugin('html').tap(args => {
