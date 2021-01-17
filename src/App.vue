@@ -1,6 +1,9 @@
 <template>
   <div class="main" @click="closeSearch">
+    <!-- 设置组件 -->
     <setting></setting>
+
+    <!-- 输入框 -->
     <input
       type="text"
       :placeholder="placeholder"
@@ -9,10 +12,15 @@
       @click.stop=""
       @input="searchVague"
       @keyup="keyupThen"
-      :class="showClass"
+      :class="showClass "
       ref="infocus"
     />
-    <ul class="searchTools" @click="inputWorld" :class="showIcon">
+    <!-- 搜索工具 -->
+    <ul
+      class="searchTools"
+      @click="inputWorld"
+      :class="showIcon"
+    >
       <li
         @click.stop="baidu"
         v-if="searchLogoActive === 0"
@@ -54,9 +62,11 @@
         <span class="iconfont icon-huaban88"></span>
       </li>
     </ul>
+    <!-- 相关搜索 -->
     <div :class="showKeyworld">
       <div class="transfrom" @click.stop="playAuido">
-        翻译：{{ keyWorld }}<span class="iconfont icon-sound"> alt+/</span>
+        翻译：{{ transfromHtml
+        }}<span class="iconfont icon-sound"> 快捷键：alt+/ </span>
       </div>
       <ul v-for="(item, i) in getKeyList" :key="i">
         <li
@@ -69,6 +79,7 @@
         <li v-else @click.stop="keyListSearch(item.q)">{{ item.q }}</li>
       </ul>
     </div>
+    <!-- 背景控制 -->
     <change></change>
     <!-- 声音播放 -->
     <audio :src="audioUrl" ref="audioRef"></audio>
@@ -79,19 +90,31 @@
 import change from './components/Change'
 import setting from './components/Set'
 // 引入常量
-import { urls } from './partten'
+import { urls, chinese } from './partten'
 export default {
   components: { setting, change },
   data () {
     return {
+      // 用户搜索词
       keyWorld: '',
+      // 翻译词
       transfromWorld: '',
+      transfromHtml: '',
+      // 默认搜索框提示
       placeholder: 'Search',
+      // 是否聚焦搜索框
       isFocus: false,
+      // 获取关键词
       getKeyList: [],
+      // 关键词获取节流阀
       status: true,
+      // 翻译节流阀
+      playAuidoStatus: true,
+      // 上下选初始化
       keyListActive: -1,
+      // 左右选初始化
       searchLogoActive: 0,
+      // 音频合成url
       audioUrl: ''
     }
   },
@@ -109,35 +132,36 @@ export default {
     closeSearch () {
       this.placeholder = 'Search'
       this.isFocus = false
-      this.getKeyList = ''
+      this.getKeyList = []
       this.keyWorld = ''
       this.keyListActive = -1
+      this.transfromHtml = ''
     },
     baidu () {
       this.searchLogoActive = 0
       if (this.keyWorld.trim() !== '') {
-        window.open(urls.baiduUrl + this.keyWorld)
+        window.open(urls.baiduUrl + encodeURI(this.keyWorld))
       }
       this.keyWorld = ''
     },
     bing () {
       this.searchLogoActive = 1
       if (this.keyWorld.trim() !== '') {
-        window.open(urls.bingUrl + this.keyWorld)
+        window.open(urls.bingUrl + encodeURI(this.keyWorld))
       }
       this.keyWorld = ''
     },
     google () {
       this.searchLogoActive = 2
       if (this.keyWorld.trim() !== '') {
-        window.open(urls.googleUrl + this.keyWorld)
+        window.open(urls.googleUrl + encodeURI(this.keyWorld))
       }
       this.keyWorld = ''
     },
     github () {
       this.searchLogoActive = 3
       if (this.keyWorld.trim() !== '') {
-        window.open(urls.githubUrl + this.keyWorld)
+        window.open(urls.githubUrl + encodeURI(this.keyWorld))
       }
       this.keyWorld = ''
     },
@@ -148,8 +172,8 @@ export default {
       if (this.status && this.keyWorld.trim() !== '') {
         this.status = false
         timer = setTimeout(() => {
+          this.transfromWorld = this.keyWorld
           this.getWorldKey()
-          this.audioUrl = urls.youdaoUrl + this.keyWorld
           this.status = true
         }, 500)
       } else {
@@ -162,8 +186,28 @@ export default {
       // jsonp方法会自动添加callback
       this.$jsonp(url, {}).then((json) => {
         // 返回的jsonp数据不会放这里，而是在 window.jsonpCallback
-        this.getKeyList = json.g
+        json.g ? (this.getKeyList = json.g) : (this.getKeyList = [])
       })
+    },
+    // 获取翻译
+    async getTransfrom () {
+      if (this.transfromWorld.trim() === '') {
+        return
+      }
+      const { data: res } = await this.$http.get('test', {
+        params: {
+          word: this.transfromWorld
+        }
+      })
+      if (res.code !== 200) {
+        return this.$message.error('没学过这种语言啊，自创的？')
+      }
+      // 展示结果
+      this.transfromHtml = res.translation
+      // 更改音频只读英文
+      !chinese.test(this.transfromHtml)
+        ? (this.audioUrl = urls.youdaoUrl + this.transfromHtml)
+        : (this.audioUrl = urls.youdaoUrl + this.keyWorld)
     },
     // 键盘事件
     keyupThen (e) {
@@ -230,12 +274,21 @@ export default {
     },
     // 播放声音英文
     playAuido () {
-      if (this.keyWorld.trim() === '') {
-        return
+      console.log()
+      var timer = null
+      if (this.keyWorld.trim() !== '' && this.playAuidoStatus) {
+        this.playAuidoStatus = false
+        timer = setTimeout(() => {
+          this.$message.success('只读英文哦！')
+          this.$refs.audioRef.play()
+          this.playAuidoStatus = true
+        }, 500)
+      } else {
+        clearTimeout(timer)
+        return this.$refs.audioRef.ended
+          ? this.$message.error('你手速太快了！')
+          : this.$message.error('还没播完呢')
       }
-      // await this.$refs.audioRef.load()
-      this.$message.success('即将阅读翻译！')
-      this.$refs.audioRef.play()
     }
   },
   computed: {
@@ -263,28 +316,109 @@ export default {
   watch: {
     searchLogoActive: function () {
       window.localStorage.setItem('searchLogoActive', this.searchLogoActive)
+    },
+    transfromWorld: function () {
+      this.getTransfrom()
     }
   }
 }
 </script>
 
 <style scoped>
-.main {
+/* 媒体查询适配背景 */
+body .main {
   position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  background: url("https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg&amp;rf=LaDigue_1920x1080.jpg&amp;pid=hp")
-    no-repeat;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
   background-position-x: center;
-  /* z-index: -99; */
-  -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg&amp;rf=LaDigue_1920x1080.jpg&amp;pid=hp', sizingMethod='scale')";
-  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg&amp;rf=LaDigue_1920x1080.jpg&amp;pid=hp', sizingMethod='scale');
+}
+/* 大屏幕 ：大于等于1200px*/
+@media (min-width: 1200px) {
+  .main {
+    background: url("https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg")
+      no-repeat;
+    /* z-index: -99; */
+    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg', sizingMethod='scale')";
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg', sizingMethod='scale');
+  }
+}
+
+/*默认*/
+@media (min-width: 980px) {
+  .main {
+    background: url("https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg")
+      no-repeat;
+    /* z-index: -99; */
+    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg', sizingMethod='scale')";
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='https://cn.bing.com/th?id=OHR.ChateauBeynac_ZH-CN8777586167_1920x1080.jpg', sizingMethod='scale');
+  }
+}
+
+/* 平板电脑和小屏电脑之间的分辨率 */
+@media (min-width: 768px) and (max-width: 979px) {
+  .main {
+    background: url("https://cn.bing.com/ImageResolution.aspx?w=1366&h=1024")
+      no-repeat;
+  }
+}
+/* 横向放置的手机和竖向放置的平板之间的分辨率 */
+@media (max-width: 767px) {
+  .main {
+    background: url("https://cn.bing.com/ImageResolution.aspx?w=768&h=1024")
+      no-repeat;
+  }
+/* input输入框 */
+body .default {
+  top: 80px;
+  left: 50%;
+  width: 215px;
+  height:30px;
+  border-radius: 25px;
+}
+body .default:hover{
+  width: 280px;
+}
+body .active {
+  width: 280px;
+}
+body .active:hover {
+  width: 280px;
+}
+/* 搜索logo */
+body .searchTools {
+  top: 120px;
+  left: 50%;
+}
+body .searchTools li {
+  font-size: 14px;
+  padding: 5px 7px;
+  margin: 4px;
+}
+/* 搜索建议 */
+body .keyworld {
+  top: 168px;
+  left: 50%;
+  width: 280px;
+  height: 180px;
+}
+body .keyworld li,
+body .transfrom {
+  font-size: 14px;
+  height: 24px;
+  line-height: 24px;
+}
+}
+
+/* 横向放置的手机及分辨率更小的设备 */
+@media (max-width: 480px) {
+  .main {
+    background: url("https://cn.bing.com/ImageResolution.aspx?w=540&h=720")
+      no-repeat;
+  }
 }
 /* .mkg {
   position: absolute;
@@ -317,8 +451,8 @@ export default {
   transition: all 0.25s;
   cursor: pointer;
 }
-.searchTools li:hover{
-  color: #11111190;
+.searchTools li:hover {
+  color: rgba(17, 17, 17, 0.9);
   transform: scale(1.1);
 }
 .default {
@@ -346,18 +480,18 @@ export default {
 }
 .default:hover {
   width: 530px;
-  color: #111111;
+  color: rgb(17, 17, 17);
   background-color: rgba(255, 255, 255, 0.6);
   box-shadow: rgba(0, 0, 0, 0.3) 0 0 10px;
 }
 .active {
   width: 530px;
-  color: #111111;
-  background-color: #fff;
+  color: rgb(17, 17, 17);
+  background-color: rgb(255, 255, 255);
 }
 .active:hover {
   width: 530px;
-  color: #111111;
+  color: rgb(17, 17, 17);
   background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.3) 0 0 10px;
 }
@@ -380,33 +514,35 @@ export default {
   text-indent: 20px;
   line-height: 30px;
   cursor: pointer;
-  background-color: #cccccc65;
-  color: rgba(255, 255, 255);
+  background-color: rgba(204, 204, 204, 0.25);
+  color: rgb(255, 255, 255);
   border-bottom: solid 1px rgba(0, 0, 0, 0);
   transition: all 0.25s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .keyworld li:hover,
 .transfrom:hover {
   padding-left: 10px;
   font-weight: 700;
-  background-color: #cccccc98;
+  background-color: rgba(204, 204, 204, 0.5);
   color: rgba(255, 255, 255, 0.9);
 }
 .show {
-  display: block;
+  display: block !important;
 }
 .searchTools .searchLogoActive {
   /* color: rgba(255, 255, 255, 0.9); */
-  color: #111111;
+  color: rgb(17, 17, 17);
   background-color: rgba(255, 255, 255, 0.5);
   box-shadow: rgba(0, 0, 0, 0.2) 0 0 10px;
   backdrop-filter: blur(10px);
   border: none;
 }
-.keyListActive {
+.main .keyListActive {
   font-weight: 700;
   padding-left: 10px;
-  background-color: #cccccc98;
   color: rgba(255, 255, 255, 0.9);
 }
 .icon-sound {
