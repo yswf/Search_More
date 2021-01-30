@@ -2,7 +2,7 @@
   <div class="main" @click="closeSearch">
     <!-- 设置组件 -->
     <setting></setting>
-
+    <card :message="getKeyList[0]" :class="showCard"></card>
     <!-- 输入框 -->
     <input
       type="text"
@@ -72,11 +72,11 @@
         <li
           v-if="keyListActive === i"
           class="keyListActive"
-          @click.stop="keyListSearch(item.q)"
+          @click.stop="keyListSearch(item.word)"
         >
-          {{ item.q }}
+          {{ item.word }}
         </li>
-        <li v-else @click.stop="keyListSearch(item.q)">{{ item.q }}</li>
+        <li v-else @click.stop="keyListSearch(item.word)">{{ item.word }}</li>
       </ul>
     </div>
     <!-- 背景控制 -->
@@ -89,10 +89,11 @@
 <script>
 import change from './components/Change'
 import setting from './components/Set'
+import card from './components/Card'
 // 引入常量
 import { urls, chinese } from './partten'
 export default {
-  components: { setting, change },
+  components: { setting, change, card },
   data () {
     return {
       // 用户搜索词
@@ -115,7 +116,9 @@ export default {
       // 左右选初始化
       searchLogoActive: 0,
       // 音频合成url
-      audioUrl: ''
+      audioUrl: '',
+      // 是否有卡片
+      isCard: false
     }
   },
   created () {
@@ -182,19 +185,26 @@ export default {
     },
     // 获取关键词
     getWorldKey () {
-      const url = urls.baiduKeysUrl + this.keyWorld
+      if (this.keyWorld.trim() === '') {
+        return
+      }
+      const url = urls.quarkApi + this.keyWorld
       // jsonp方法会自动添加callback
       this.$jsonp(url, {}).then((json) => {
         // 返回的jsonp数据不会放这里，而是在 window.jsonpCallback
-        json.g ? (this.getKeyList = json.g) : (this.getKeyList = [])
+        console.log(json.data.value)
+        json.data.value ? (this.getKeyList = json.data.value) : (this.getKeyList = [])
+        // 显示多功能卡片视图
+        json.data.value[0].type !== 'text' ? this.isCard = true : this.isCard = false
       })
+        .catch(() => this.$message.error('接口繁忙！'))
     },
     // 获取翻译
     async getTransfrom () {
       if (this.transfromWorld.trim() === '') {
         return
       }
-      const { data: res } = await this.$http.get('test', {
+      const { data: res } = await this.$http.get(urls.translationApi, {
         params: {
           word: this.transfromWorld
         }
@@ -252,7 +262,7 @@ export default {
           this.keyListActive = this.getKeyList.length
         }
         this.keyListActive--
-        this.keyWorld = this.getKeyList[this.keyListActive].q
+        this.keyWorld = this.getKeyList[this.keyListActive].word
       }
 
       // 下选
@@ -261,7 +271,7 @@ export default {
           this.keyListActive = -1
         }
         this.keyListActive++
-        this.keyWorld = this.getKeyList[this.keyListActive].q
+        this.keyWorld = this.getKeyList[this.keyListActive].word
       }
     },
     // 联想词条搜索
@@ -310,6 +320,13 @@ export default {
     showIcon: function () {
       return {
         show: this.isFocus
+      }
+    },
+    // 卡片视图控制
+    showCard: function () {
+      return {
+        cardBlock: true,
+        show: this.isCard && this.keyWorld.trim() !== ''
       }
     }
   },
@@ -410,6 +427,9 @@ body .transfrom {
   font-size: 14px;
   height: 24px;
   line-height: 24px;
+}
+body .cardBlock {
+  display: none !important;
 }
 }
 
@@ -551,5 +571,9 @@ body .transfrom {
 }
 .icon-sound:hover {
   transform: scale(1.3);
+}
+/* 卡片隐藏 */
+.cardBlock{
+  display: none;
 }
 </style>

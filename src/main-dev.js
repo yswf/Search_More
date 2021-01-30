@@ -10,7 +10,8 @@ import './assets/font/iconfont.css'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 // 配置axios
-axios.defaults.baseURL = 'http://yswf.xyz:64570'
+// axios.defaults.baseURL = 'http://yswf.xyz:64570'
+axios.defaults.timeout = 2000
 axios.interceptors.request.use(config => {
   NProgress.start()
   // 必须return
