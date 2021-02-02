@@ -184,24 +184,27 @@ export default {
       }
     },
     // 获取关键词
-    getWorldKey () {
+    async getWorldKey () {
       if (this.keyWorld.trim() === '') {
+        this.getKeyList = []
         return
       }
-      const url = urls.quarkApi + this.keyWorld
-      // jsonp方法会自动添加callback
-      this.$jsonp(url, {}).then((json) => {
-        // 返回的jsonp数据不会放这里，而是在 window.jsonpCallback
-        console.log(json.data.value)
-        json.data.value ? (this.getKeyList = json.data.value) : (this.getKeyList = [])
-        // 显示多功能卡片视图
-        json.data.value[0].type !== 'text' ? this.isCard = true : this.isCard = false
+      const { data: res } = await this.$http.get(urls.quarkApi, {
+        params: {
+          q: this.keyWorld
+        }
       })
-        .catch(() => this.$message.error('接口繁忙！'))
+      if (res.status !== 0) {
+        return this.$message.error('接口繁忙！')
+      }
+      this.getKeyList = res.data.value
+      res.data.value[0].type !== 'text' ? this.isCard = true : this.isCard = false
     },
     // 获取翻译
     async getTransfrom () {
       if (this.transfromWorld.trim() === '') {
+        this.transfromWorld = ''
+        this.transfromHtml = ''
         return
       }
       const { data: res } = await this.$http.get(urls.translationApi, {

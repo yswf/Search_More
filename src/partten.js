@@ -6,8 +6,8 @@ export const urls = {
   githubUrl: 'https://github.com/search?q=',
   youdaoUrl: 'http://dict.youdao.com/dictvoice?type=0&audio=',
   // 备份 youdaoUrl: 'http://tts.youdao.com/fanyivoice?word=',
-  translationApi: 'http://yswf.xyz:64570/test',
-  quarkApi: 'https://quark.sm.cn/api/quark_sug?q='
+  translationApi: 'http://api.yswf.xyz/test',
+  quarkApi: 'http://api.yswf.xyz/api/quark_sug'
   // baiduKeysUrl:
   //     'https://www.baidu.com/sugrec?pre=1&p=3&ie=utf-8&json=1&prod=pc&from=pc_web&wd='
   // bingImgUrl: 'https://cn.bing.com/ImageResolution.aspx?w=375&h=667'
