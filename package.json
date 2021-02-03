@@ -12,8 +12,7 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.4.5",
     "nprogress": "^0.2.0",
-    "vue": "^2.6.11",
-    "vue-jsonp": "^2.0.0"
+    "vue": "^2.6.11"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

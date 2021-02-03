@@ -1,5 +1,6 @@
 <template>
-  <div @click.stop="">
+  <main @click.stop="">
+    <!-- 天气卡片 -->
     <section
       class="special_weather"
       v-if="message.type === 'special_weather'"
@@ -17,29 +18,48 @@
         </li>
       </ul>
     </section>
+    <!-- strong_1类型卡片 -->
     <section class="strong_1" v-if="message.type === 'strong_1'" @click="newTab(message.style.button.url)">
       <div class="pic" :style="backGroundUrl"></div>
-      <h3>{{ message.word }}</h3>
+      <h3>{{ message.style.title }}</h3>
       <span>{{ message.style.label }}</span>
       <p v-if="message.style.addition_information.data.length === 1">{{message.style.addition_information.data[0].value}}</p>
       <p class="moretext" v-else v-for="(item, i) in message.style.addition_information.data" :key="i">{{item.source + item.value}}</p>
       <nav>
-        <a :href="item.url" v-for="(item, i) in message.style.nav" :key="i" target="_blank" @click.stop="">{{item.text}}</a>
+        <a :href="item.url" v-for="(item, i) in message.style.nav" :key="i" target="_blank" @click.stop="" >{{item.text}}</a>
       </nav>
     </section>
-    <section class="strong_2" v-if="message.type === 'strong_2'">
-      列表卡片：大标题 有序列表
+    <!-- strong_2类型卡片 -->
+    <section class="strong_2" v-if="message.type === 'strong_2'" @click="newTab(message.style.url)">
+      <div class="pic" :style="backGroundUrl"></div>
+      <h3>{{ message.style.title }}</h3>
+      <span>{{message.style.subtitle}}</span>
+      <p>{{message.style.content}}</p>
     </section>
-    <section class="strong_3" v-if="message.type === 'strong_3'">
-      百科类型：标题，下面图片列
+    <!-- strong_3类型卡片 -->
+    <section class="strong_3" v-if="message.type === 'strong_3'" @click="newTab(message.style.url)">
+      <h4>{{message.style.title}}</h4>
+      <nav>
+        <a :href="item.link" :title="item.title" v-for="(item,i) in message.style.pics" :key="i" target="_blank" @click.stop="">
+        <img :src="item.url">
+        <p>{{item.title}}</p>
+        <span>{{item.information}}</span>
+      </a>
+      </nav>
     </section>
-    <section class="normal_1" v-if="message.type === 'normal_1'">
-      网站卡片：1张图两段文字
+    <!-- strong_3类型卡片 -->
+    <section class="normal_1" v-if="message.type === 'normal_1'" @click="newTab(message.style.button.url)">
+       <div class="pic" :style="backGroundUrl"></div>
+       <h3>{{ message.style.title }}</h3>
+       <div class="cardType">{{message.style.label}}</div>
+       <span>{{message.style.addition_information.data[0].value}}</span>
+       <el-button type="primary" v-if="message.style.button.text">{{message.style.button.text}}</el-button>
     </section>
-  </div>
+  </main>
 </template>
 <script>
 export default {
+  // 获取父组件传过来数据，注意设置默认对象
   props: {
     message: {
       type: Object,
@@ -49,40 +69,54 @@ export default {
     }
   },
   methods: {
+    // 打开卡片链接
     newTab (url) {
       window.open(url)
     }
   },
   computed: {
+    // 获取卡片图片
     backGroundUrl () {
+      const imgurl = this.message.style.pic.url || require('../assets/img/default.png')
       return {
-        backgroundImage: 'url(' + this.message.style.pic.url + ')'
+        backgroundImage: 'url(' + imgurl + ')'
       }
-    },
-    inHtmltext () {
-      let text = ''
-      this.message.style.addition_information.data.forEach(data => {
-        text += (data.value + '<br>')
-      })
-      return text
     }
   }
 }
 </script>
 
 <style scoped>
-div {
+main{
   position: relative;
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
   width: 530px;
   height: 165px;
+  overflow: hidden;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
 }
 section {
   cursor: pointer;
+}
+/* 初始化pic */
+.pic{
+width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-position-x: center;
+}
+/* span初始化 */
+section span{
+  padding: 3px;
+  font-size: 13px;
+  color: rgb(249,224,222);
 }
 /* 天气 */
 .special_weather > img {
@@ -134,15 +168,7 @@ section {
 .strong_1 .pic {
   position: absolute;
   top: 35px;
-  left: 70px;
-  width: 100px;
-  height: 100px;
-  border-radius: 10px;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-  background-position-x: center;
+  left: 22px;
 }
 .strong_1 h3{
   position: absolute;
@@ -153,9 +179,6 @@ section {
   position: absolute;
   top: 35px;
   right: 30px;
-  padding: 3px;
-  font-size: 13px;
-  color: rgb(249,224,222);
   /* background-color: rgba(240,174,169,1); */
   border-radius: 6px;
 }
@@ -163,17 +186,21 @@ section {
   position: absolute;
   top: 47px;
   left: 130px;
-  /* text-indent:2em; */
   padding: 0 10px;
+  /* -ms-max-height: 3.5em; */
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 3; /*想省略几行就写几*/
   -webkit-box-orient: vertical;
+  display:-moz-box;
+  -moz-line-clamp: 3; /*想省略几行就写几*/
+  -moz-box-orient:vertical;
 }
 /* 多类型文本时候 */
 .strong_1 .moretext{
    -webkit-line-clamp: 1; /*想省略几行就写几*/
+   -moz-line-clamp: 1;
 }
 .strong_1 p:nth-of-type(2){
  top: 68px;
@@ -200,5 +227,129 @@ section {
   text-align: center;
   background-color: rgba(255, 255, 255, 0.3);
   border-radius: 6px;
+}
+.strong_1 nav a:nth-of-type(n+5){
+ display: none;
+}
+/* strong_2 */
+.strong_2 .pic{
+position: absolute;
+top: 10px;
+left: 12px;
+width: 80px;
+height: 80px;
+}
+.strong_2 h3{
+  position: absolute;
+  top: 20px;
+  left: 85px;
+}
+.strong_2 span{
+  position: absolute;
+  top: 65px;
+  left: 85px;
+}
+.strong_2 p{
+  position: absolute;
+  top: 80px;
+  left: 10px;
+   overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /*想省略几行就写几*/
+  -webkit-box-orient: vertical;
+  display:-moz-box;
+  -moz-line-clamp: 3; /*想省略几行就写几*/
+  -moz-box-orient:vertical;
+}
+/* strong_3部分 */
+.strong_3 h4{
+  margin: 0;
+  padding: 10px 0;
+  text-align: center;
+}
+.strong_3 nav{
+  display: flex;
+justify-self: center;
+  width: 100%;
+  height: 120px;
+}
+.strong_3 nav a{
+  flex: 1;
+position: relative;
+margin: 0 13px;
+width: 80px;
+height: 80px;
+}
+.strong_3 nav a img{
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.strong_3 nav a:hover{
+  transform: scale(1.1);
+}
+.strong_3 nav a p{
+  position: absolute;
+ font-size: 14px;
+ width: 100%;
+ text-align: center;
+  bottom: -35px;
+  left: 0;
+  color: black;
+overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /*想省略几行就写几*/
+  -webkit-box-orient: vertical;
+  display:-moz-box;
+  -moz-line-clamp: 1; /*想省略几行就写几*/
+  -moz-box-orient:vertical;
+
+}
+.strong_3 nav a span{
+  position: absolute;
+  bottom: -40px;
+  left: 0;
+  font-size: 12px;
+  text-align: center;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /*想省略几行就写几*/
+  -webkit-box-orient: vertical;
+  display:-moz-box;
+  -moz-line-clamp: 1; /*想省略几行就写几*/
+  -moz-box-orient:vertical;
+}
+/* normal_1部分 */
+.normal_1 .pic{
+ position: absolute;
+    top: 22px;
+    left: 22px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+}
+.normal_1 h3{
+  position: absolute;
+  top: 22px;
+  left:155px;
+}
+.normal_1 span{
+  position: absolute;
+  top: 66px;
+  font-size: 14px;
+  left: 155px;
+}
+.cardType{
+  width: 100%;
+  margin: 10px 0;
+  color: rgba(81,81,83,0.8);
+  text-align: center;
+}
+.el-button{
+  position: absolute;
+  top:70px ;
+  right: 30px;
+  border-radius: 20px;
 }
 </style>

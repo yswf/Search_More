@@ -10,8 +10,7 @@ module.exports = {
       config.set('externals', {
         vue: 'Vue',
         axios: 'axios',
-        nprogress: 'NProgress',
-        'vue-jsonp': 'VueJsonp'
+        nprogress: 'NProgress'
       })
 
       config.plugin('html').tap(args => {

@@ -9,6 +9,7 @@
       :placeholder="placeholder"
       v-model="keyWorld"
       @focus="inputWorld"
+      @dblclick.stop="cleanSearch"
       @click.stop=""
       @input="searchVague"
       @keyup="keyupThen"
@@ -128,13 +129,22 @@ export default {
     this.$refs.infocus.focus()
   },
   methods: {
+    // 获取搜索框
     inputWorld () {
       this.placeholder = ''
       this.isFocus = true
     },
+    // 关闭搜索
     closeSearch () {
       this.placeholder = 'Search'
       this.isFocus = false
+      this.getKeyList = []
+      this.keyWorld = ''
+      this.keyListActive = -1
+      this.transfromHtml = ''
+    },
+    // 双击和delete清理搜索框内容
+    cleanSearch () {
       this.getKeyList = []
       this.keyWorld = ''
       this.keyListActive = -1
@@ -145,28 +155,24 @@ export default {
       if (this.keyWorld.trim() !== '') {
         window.open(urls.baiduUrl + encodeURI(this.keyWorld))
       }
-      this.keyWorld = ''
     },
     bing () {
       this.searchLogoActive = 1
       if (this.keyWorld.trim() !== '') {
         window.open(urls.bingUrl + encodeURI(this.keyWorld))
       }
-      this.keyWorld = ''
     },
     google () {
       this.searchLogoActive = 2
       if (this.keyWorld.trim() !== '') {
         window.open(urls.googleUrl + encodeURI(this.keyWorld))
       }
-      this.keyWorld = ''
     },
     github () {
       this.searchLogoActive = 3
       if (this.keyWorld.trim() !== '') {
         window.open(urls.githubUrl + encodeURI(this.keyWorld))
       }
-      this.keyWorld = ''
     },
     // 模糊搜索
     searchVague () {
@@ -197,8 +203,11 @@ export default {
       if (res.status !== 0) {
         return this.$message.error('接口繁忙！')
       }
+      // 在此运行代码
+      // 配置返回对象某些默认属性
+      const cardType = res.data.value[0].type || 'no'
       this.getKeyList = res.data.value
-      res.data.value[0].type !== 'text' ? this.isCard = true : this.isCard = false
+      cardType !== 'text' && cardType !== 'special_tinyapp' ? this.isCard = true : this.isCard = false
     },
     // 获取翻译
     async getTransfrom () {
@@ -213,7 +222,7 @@ export default {
         }
       })
       if (res.code !== 200) {
-        return this.$message.error('没学过这种语言啊，自创的？')
+        return this.$message.error('没学过这种翻译语法，自创的？')
       }
       // 展示结果
       this.transfromHtml = res.translation
@@ -224,20 +233,23 @@ export default {
     },
     // 键盘事件
     keyupThen (e) {
+      // 快捷键播放翻译
       if (e.altKey && (e.keyCode === 191 || e.keyCode === 229)) {
         this.playAuido()
       }
       const keys =
-        e.keyCode !== 13 &&
-        e.keyCode !== 37 &&
-        e.keyCode !== 39 &&
-        e.keyCode !== 38 &&
-        e.keyCode !== 40
+        e.keyCode === 13 ||
+        e.keyCode === 37 ||
+        e.keyCode === 39 ||
+        e.keyCode === 38 ||
+        e.keyCode === 40 ||
+        e.keyCode === 46
       // 回车搜索
-      if (keys) {
+      if (!keys) {
         return
       }
       e.preventDefault()
+      // 回车搜索
       if (e.keyCode === 13) {
         this.searchLogoActive === 0 && this.baidu()
         this.searchLogoActive === 1 && this.bing()
@@ -266,6 +278,7 @@ export default {
         }
         this.keyListActive--
         this.keyWorld = this.getKeyList[this.keyListActive].word
+        // this.searchVague()
       }
 
       // 下选
@@ -275,6 +288,11 @@ export default {
         }
         this.keyListActive++
         this.keyWorld = this.getKeyList[this.keyListActive].word
+        // this.searchVague()
+      }
+      // delete 清空搜索框
+      if (e.keyCode === 46 && this.keyWorld !== '') {
+        this.cleanSearch()
       }
     },
     // 联想词条搜索
@@ -287,7 +305,6 @@ export default {
     },
     // 播放声音英文
     playAuido () {
-      console.log()
       var timer = null
       if (this.keyWorld.trim() !== '' && this.playAuidoStatus) {
         this.playAuidoStatus = false
@@ -298,7 +315,7 @@ export default {
         }, 500)
       } else {
         clearTimeout(timer)
-        return this.$refs.audioRef.ended
+        this.$refs.audioRef.ended
           ? this.$message.error('你手速太快了！')
           : this.$message.error('还没播完呢')
       }

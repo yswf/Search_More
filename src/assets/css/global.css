@@ -55,3 +55,7 @@ input:hover::-ms-input-placeholder { /* Internet Explorer 10+ */
     color: black;
     font-size: 14px;
   }
+/* IE11 禁用清除按钮（叉号） */
+input::-ms-clear{display:none;}
+/* IE11 禁用显示密码按钮（小眼睛） */
+input::-ms-reveal{display:none;}
