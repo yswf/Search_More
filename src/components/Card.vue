@@ -47,13 +47,28 @@
       </a>
       </nav>
     </section>
-    <!-- strong_3类型卡片 -->
+    <!-- strong_5类型卡片 -->
+    <section class="strong_5" v-if="message.type === 'strong_5'" @click="newTab(message.style.url)">
+      <div class="pic" :style="backGroundUrl"></div>
+      <h3>{{ message.style.title }}</h3>
+      <span>{{ message.style.label }}</span>
+      <p v-if="message.style.addition_information.data.length === 1">{{message.style.addition_information.data[0].value}}</p>
+      <p class="moretext" v-else v-for="(item, i) in message.style.addition_information.data" :key="i">{{item.source + item.value}}</p>
+    </section>
+    <!-- normal_1类型卡片 -->
     <section class="normal_1" v-if="message.type === 'normal_1'" @click="newTab(message.style.button.url)">
        <div class="pic" :style="backGroundUrl"></div>
        <h3>{{ message.style.title }}</h3>
        <div class="cardType">{{message.style.label}}</div>
        <span>{{message.style.addition_information.data[0].value}}</span>
        <el-button type="primary" v-if="message.style.button.text">{{message.style.button.text}}</el-button>
+    </section>
+    <!-- 计算器卡片 -->
+    <section class="special_calculator" v-if="message.type === 'special_calculator'" @click="newTab(message.style.url)">
+      <img :src="message.style.pic.url">
+      <p>{{message.style.title}}</p>
+      <h3>{{message.style.answer}}</h3>
+
     </section>
   </main>
 </template>
@@ -117,6 +132,10 @@ section span{
   padding: 3px;
   font-size: 13px;
   color: rgb(249,224,222);
+}
+.moretext{
+   -webkit-line-clamp: 1; /*想省略几行就写几*/
+   -moz-line-clamp: 1;
 }
 /* 天气 */
 .special_weather > img {
@@ -243,6 +262,13 @@ height: 80px;
   position: absolute;
   top: 20px;
   left: 85px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /*想省略几行就写几*/
+  -webkit-box-orient: vertical;
+  display:-moz-box;
+  -moz-line-clamp: 1; /*想省略几行就写几*/
+  -moz-box-orient:vertical;
 }
 .strong_2 span{
   position: absolute;
@@ -311,6 +337,7 @@ overflow: hidden;
   bottom: -40px;
   left: 0;
   font-size: 12px;
+  width: 100%;
   text-align: center;
   overflow: hidden;
   display: -webkit-box;
@@ -319,6 +346,38 @@ overflow: hidden;
   display:-moz-box;
   -moz-line-clamp: 1; /*想省略几行就写几*/
   -moz-box-orient:vertical;
+}
+/*.strong_5部分  */
+.strong_5 .pic{
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  border-radius: 0;
+  width: 95px;
+  height: 128px;
+}
+.strong_5 h3{
+position: absolute;
+top: 0;
+left: 140px;
+}
+.strong_5 span{
+position: absolute;
+bottom: 20px;
+right: 12px;
+}
+.strong_5 p{
+  position: absolute;
+  left: 140px;
+}
+.strong_5 p:nth-of-type(1){
+top: 50px;
+}
+.strong_5 p:nth-of-type(2){
+top: 70px;
+}
+.strong_5 p:nth-of-type(3){
+top: 90px;
 }
 /* normal_1部分 */
 .normal_1 .pic{
@@ -351,5 +410,21 @@ overflow: hidden;
   top:70px ;
   right: 30px;
   border-radius: 20px;
+}
+/* 计算器 */
+.special_calculator img{
+  width: 150px;
+  height: 150px;
+margin: auto;
+}
+.special_calculator p{
+position: absolute;
+top: 14px;
+left: 146px;
+}
+.special_calculator h3{
+  position: absolute;
+top: 35px;
+left: 150px;
 }
 </style>

@@ -6,6 +6,7 @@ body,
     padding: 0;
     margin: 0;
 }
+body { font-family: "Arial", "Microsoft YaHei", "PingFangSC-Regular", "SimSun", "宋体"; }
 ul,
 li{
     padding: 0;

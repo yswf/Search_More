@@ -46,6 +46,17 @@
 </template>
 <script>
 export default {
+  created () {
+    if (!window.localStorage.getItem('searchLogoActive')) {
+      const h = this.$createElement
+      this.$notify({
+        title: 'SearchMore',
+        message: h('i', { style: 'color: teal' }, '更少样式，更多体验，更专注于搜索！'),
+        position: 'bottom-right',
+        duration: 3000
+      })
+    }
+  },
   data () {
     return {
       setDialogVisible: false,
