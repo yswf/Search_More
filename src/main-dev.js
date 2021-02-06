@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import axios from 'axios'
+import VueClipboard from 'vue-clipboard2'
 import './plugins/element.js'
 import './assets/css/global.css'
 import './assets/font/iconfont.css'
@@ -24,6 +25,8 @@ axios.interceptors.response.use(config => {
 // 使用axios
 Vue.prototype.$http = axios
 Vue.config.productionTip = false
+// 使用VueClipboard
+Vue.use(VueClipboard)
 new Vue({
   render: h => h(App)
 }).$mount('#app')

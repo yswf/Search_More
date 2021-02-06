@@ -13,6 +13,20 @@ li{
     margin: 0;
     list-style: none;
 }
+.el-message{
+min-width: 200px;
+}
+.el-input-group__prepend{
+  width: 42px;
+  text-align: center;
+  padding: 0 10px;
+}
+.el-input__inner{
+  height: 30px;
+  line-height: 30px;
+  border: none;
+  border-bottom: 1px solid #DCDFE6;;
+}
 a:link{
   text-decoration:none;
    /* 指正常的未被访问过的链接*/

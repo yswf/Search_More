@@ -13,7 +13,7 @@
       <ul>
         <li v-for="(item, i) in message.style.information" :key="i">
           <img :src="item.weather" />
-          <span>{{ item.time }}</span>
+          <span>{{ item.time }}</span><br>
           <span>{{ item.low_tem + "-" + item.high_tem }}</span>
         </li>
       </ul>
@@ -301,15 +301,15 @@ justify-self: center;
   height: 120px;
 }
 .strong_3 nav a{
-  flex: 1;
+flex: 1;
 position: relative;
 margin: 0 13px;
 width: 80px;
 height: 80px;
 }
 .strong_3 nav a img{
-  width: 100%;
-  height: 100%;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
 }
 .strong_3 nav a:hover{

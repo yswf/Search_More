@@ -4,10 +4,10 @@ export const defaultUrls = {
   bingUrl: 'https://cn.bing.com/search?q=',
   googleUrl: 'https://search.lib.edu.eu.org/search?q=',
   githubUrl: 'https://github.com/search?q=',
-  youdaoUrl: 'http://dict.youdao.com/dictvoice?type=0&audio=',
+  youdaoUrl: 'https://dict.youdao.com/dictvoice?type=0&audio=',
   // 备份 youdaoUrl: 'http://tts.youdao.com/fanyivoice?word=',
-  translationApi: 'http://api.yswf.xyz/test',
-  quarkApi: 'http://api.yswf.xyz/api/quark_sug',
+  translationApi: 'https://api.yswf.xyz/test',
+  quarkApi: 'https://m.yswf.xyz/api/quark_sug',
   backGroundUrl: ['']
   // https://cn.bing.com/th?id=OHR.ToledoIldefonso_ZH-CN4507206651_1920x1080.jpg&amp;rf=LaDigue_1920x1080.jpg&amp;pid=hp
   // baiduKeysUrl:

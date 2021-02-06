@@ -1,45 +1,44 @@
 <template>
     <div class="hidden-md-and-down">
-    <span class="iconfont icon-set" @click="setDialogVisible = true"></span>
+    <span class="iconfont icon-set" @click="setMore"></span>
     <!-- 设置页面 -->
   <el-dialog
   title="相关设置"
   :visible.sync="setDialogVisible"
   :modal-append-to-body='false'
-  width="50%">
-   <el-table
-      :data="SettableData"
-      style="width: 100%">
-      <el-table-column
-        prop="setting"
-        label="设置"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="default"
-        label="默认状态"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="newseething"
-        label="修改">
-      </el-table-column>
-      <el-table-column
-        prop="status"
-        label="状态">
-        <template slot-scope="scope">
-            <el-switch
-              v-model="scope.row.status"
-            ></el-switch>
-          </template>
-      </el-table-column>
-    </el-table>
+  @click.stop=""
+  width="30%">
+  <el-row>
+    <el-col :span="16">自动聚焦到搜索栏</el-col>
+    <el-col :span="8"><el-switch v-model="autoFocus"></el-switch></el-col>
+  </el-row>
+  <el-row>搜索引擎设置</el-row>
+  <el-row>
+     <el-input placeholder="请输入内容" v-model="urls.baiduUrl">
+    <template slot="prepend">baidu</template>
+  </el-input>
+  </el-row>
+  <el-row>
+     <el-input placeholder="请输入内容" v-model="urls.bingUrl">
+    <template slot="prepend">bing</template>
+  </el-input>
+  </el-row>
+  <el-row>
+     <el-input placeholder="请输入内容" v-model="urls.googleUrl">
+    <template slot="prepend">google</template>
+  </el-input>
+  </el-row>
+  <el-row>
+     <el-input placeholder="请输入内容" v-model="urls.githubUrl">
+    <template slot="prepend">github</template>
+  </el-input>
+  </el-row>
     <el-row>
       <el-col :span="4" :offset="18"> <el-link type="success" href="http://wpa.qq.com/msgrd?v=3&uin=1938268436&site=qq&menu=yes" target="_blank" :underline="false">点击联系我</el-link></el-col>
   </el-row>
   <span slot="footer" >
-    <el-button @click="setDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="setDialogVisible = false">确 定</el-button>
+    <el-button @click="fatherKeylisten">取 消</el-button>
+    <el-button type="primary" @click="fatherKeylisten">确 定</el-button>
   </span>
 </el-dialog>
     </div>
@@ -60,39 +59,19 @@ export default {
   data () {
     return {
       setDialogVisible: false,
-      SettableData: [
-        {
-          setting: '默认引擎',
-          default: 'baidu',
-          newseething: '完善中',
-          status: false
-        },
-        {
-          setting: '自动聚焦',
-          default: '自动',
-          newseething: '完善中',
-          status: true
-        },
-        {
-          setting: '默认背景',
-          default: '每日必应',
-          newseething: '完善中',
-          status: true
-        },
-        {
-          setting: '自定义搜索',
-          default: '未定义',
-          newseething: '完善中',
-          status: false
-        },
-        {
-          setting: '自定义LOGO',
-          default: '未定义',
-          newseething: '完善中',
-          status: false
-        }
-
-      ]
+      autoFocus: true,
+      urls: {}
+    }
+  },
+  methods: {
+    fatherKeylisten () {
+      this.setDialogVisible = false
+      this.$emit('autoFcousKey')
+    },
+    setMore () {
+      this.urls = JSON.parse(window.localStorage.getItem('urls'))
+      console.log(this.urls)
+      this.setDialogVisible = true
     }
   }
 }
@@ -114,5 +93,8 @@ export default {
 .icon-set:hover{
   color: rgba(17, 17, 17, 0.44);
    transform: scale(1.2);
+}
+.el-row{
+  padding: 2px 4px;
 }
 </style>

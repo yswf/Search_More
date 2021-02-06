@@ -1,7 +1,7 @@
 <template>
   <div class="main" @click="closeSearch" :style="backGroundPath">
     <!-- 设置组件 -->
-    <setting></setting>
+    <setting @click.native.stop="removeKeyListen" @autoFcousKey="autoFcousKey"></setting>
     <card :message="getKeyList[0]" :class="showCard"></card>
     <!-- 输入框 -->
     <input
@@ -19,7 +19,6 @@
     <!-- 搜索工具 -->
     <ul
       class="searchTools"
-      @click="inputWorld"
       :class="showIcon"
     >
       <li
@@ -67,7 +66,9 @@
     <div :class="showKeyworld">
       <div class="transfrom" @click.stop="playAuido">
         翻译：{{ transfromHtml
-        }}<span class="iconfont icon-sound"> 快捷键：alt+/ </span>
+        }}
+      <span class="iconfont icon-sound"> alt+/ </span>
+        <i class="el-icon-document-copy" v-clipboard:copy="transfromHtml" v-clipboard:success="onCopy" v-clipboard:error="onError" @click.stop=""> 复制</i>
       </div>
       <ul v-for="(item, i) in getKeyList" :key="i">
         <li
@@ -121,7 +122,9 @@ export default {
       // 是否有卡片
       isCard: false,
       // 默认配置
-      urls: {}
+      urls: {},
+      // 是否全局监听键盘事件
+      keyStatus: true
     }
   },
   created () {
@@ -134,17 +137,22 @@ export default {
   },
   mounted () {
     // 自动获取焦点
-    this.$refs.infocus.focus()
-    // 监听按下按键获取焦点
-    window.addEventListener('keyup', () => {
-      this.$refs.infocus.focus()
-    })
+    this.autoFcousKey()
   },
   methods: {
+    // 复制成功时的回调函数
+    onCopy (e) {
+      this.$message.success('内容已复制到剪切板！')
+    },
+    // 复制失败时的回调函数
+    onError (e) {
+      this.$message.error('抱歉，复制失败！')
+    },
     // 获取搜索框
     inputWorld () {
       this.placeholder = ''
       this.isFocus = true
+      this.removeKeyListen()
     },
     // 关闭搜索
     closeSearch () {
@@ -154,6 +162,7 @@ export default {
       this.keyWorld = ''
       this.keyListActive = -1
       this.transfromHtml = ''
+      window.addEventListener('keyup', this.autoFcousKey)
     },
     // 双击和delete清理搜索框内容
     cleanSearch () {
@@ -225,14 +234,14 @@ export default {
       let cardType
       try {
         // 在此运行代码
-        cardType = res.data.value[0].type || 'no'
+        cardType = res.data.value[0].type || false
       } catch (err) {
-        cardType = 'no'
+        cardType = false
         return
       }
 
       this.getKeyList = res.data.value
-      cardType !== 'text' && cardType !== 'special_tinyapp' ? this.isCard = true : this.isCard = false
+      cardType && cardType !== 'text' && cardType !== 'special_tinyapp' ? this.isCard = true : this.isCard = false
     },
     // 获取翻译
     async getTransfrom () {
@@ -366,6 +375,14 @@ export default {
             type: 'warning'
           })
       }
+    },
+    // 全局键盘监听自动获取焦点
+    autoFcousKey () {
+      this.$refs.infocus.focus()
+    },
+    // 移除全局键盘监听
+    removeKeyListen () {
+      window.removeEventListener('keyup', this.autoFcousKey)
     }
   },
   computed: {
@@ -413,7 +430,7 @@ export default {
     urls: function () {
       window.localStorage.setItem('urls', JSON.stringify(this.urls))
     },
-    // 变化翻译
+    // 自动翻译
     transfromWorld: function () {
       this.getTransfrom()
     }
@@ -493,16 +510,6 @@ body .searchTools {
 body .searchTools .searchLogoActive{
   padding: 6px 8px;
 }
-@keyframes searchOptBoxPhone {
-0% {
-z-index: -99;
-top: 242px;
-}
-100% {
-z-index: 10;
-top: 120px;
-}
-}
 body .searchTools li {
   font-size: 14px;
   padding: 5px 7px;
@@ -522,6 +529,9 @@ body .transfrom {
   line-height: 24px;
 }
 body .cardBlock {
+  display: none !important;
+}
+body .icon-sound{
   display: none !important;
 }
 }
@@ -558,6 +568,16 @@ top: 242px;
 100% {
 z-index: 10;
 top: 265px;
+}
+}
+@keyframes searchOptBoxPhone {
+0% {
+z-index: -99;
+top: 242px;
+}
+100% {
+z-index: 10;
+top: 120px;
 }
 }
 .searchTools li {
@@ -672,11 +692,16 @@ top: 265px;
   float: right;
   padding-right: 20px;
 }
-.icon-sound:hover {
-  transform: scale(1.3);
+.icon-sound:hover,.el-icon-document-copy:hover {
+  transform: scale(1.2);
 }
 /* 卡片隐藏 */
 .cardBlock{
   display: none;
+}
+/* 复制按钮 */
+.el-icon-document-copy{
+  float: right;
+  line-height: 30px;
 }
 </style>
