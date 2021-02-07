@@ -10,7 +10,9 @@ module.exports = {
       config.set('externals', {
         vue: 'Vue',
         axios: 'axios',
-        nprogress: 'NProgress'
+        nprogress: 'NProgress',
+        'vue-clipboard2': 'VueClipboard'
+
       })
 
       config.plugin('html').tap(args => {

@@ -27,6 +27,22 @@ min-width: 200px;
   border: none;
   border-bottom: 1px solid #DCDFE6;;
 }
+.el-dialog{
+  width: 50%;
+  min-width:300px;
+  height: 70%;
+  overflow-y: scroll;
+  scrollbar-width: none;  
+  -ms-overflow-style: none;
+}
+.el-dialog::-webkit-scrollbar{
+  display: none;
+}
+/* .el-dialog__footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+} */
 a:link{
   text-decoration:none;
    /* 指正常的未被访问过的链接*/

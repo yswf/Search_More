@@ -1,7 +1,7 @@
 <template>
   <div class="main" @click="closeSearch" :style="backGroundPath">
     <!-- 设置组件 -->
-    <setting @click.native.stop="removeKeyListen" @autoFcousKey="autoFcousKey"></setting>
+    <setting @click.native.stop="removeKeyListen" @autoFocusKey="autoFocusKey" @getSetData='getSetData'></setting>
     <card :message="getKeyList[0]" :class="showCard"></card>
     <!-- 输入框 -->
     <input
@@ -82,7 +82,7 @@
       </ul>
     </div>
     <!-- 背景控制 -->
-    <change></change>
+    <change @seaveImgurl="seaveImgurl"></change>
     <!-- 声音播放 -->
     <audio :src="audioUrl" ref="audioRef"></audio>
   </div>
@@ -93,7 +93,7 @@ import change from './components/Change'
 import setting from './components/Set'
 import card from './components/Card'
 // 引入常量
-import { defaultUrls, chinese } from './partten'
+import { defaultSet, chinese } from './partten'
 export default {
   components: { setting, change, card },
   data () {
@@ -129,7 +129,7 @@ export default {
   },
   created () {
     if (!window.localStorage.getItem('urls')) {
-      window.localStorage.setItem('urls', JSON.stringify(defaultUrls))
+      window.localStorage.setItem('urls', JSON.stringify(defaultSet))
     }
     this.urls = JSON.parse(window.localStorage.getItem('urls'))
     this.searchLogoActive = window.localStorage.getItem('searchLogoActive') - 0
@@ -137,7 +137,7 @@ export default {
   },
   mounted () {
     // 自动获取焦点
-    this.autoFcousKey()
+    this.urls.autoFocus && this.autoFocusKey()
   },
   methods: {
     // 复制成功时的回调函数
@@ -162,7 +162,7 @@ export default {
       this.keyWorld = ''
       this.keyListActive = -1
       this.transfromHtml = ''
-      window.addEventListener('keyup', this.autoFcousKey)
+      window.addEventListener('keyup', this.autoFocusKey)
     },
     // 双击和delete清理搜索框内容
     cleanSearch () {
@@ -377,12 +377,21 @@ export default {
       }
     },
     // 全局键盘监听自动获取焦点
-    autoFcousKey () {
+    autoFocusKey () {
       this.$refs.infocus.focus()
     },
     // 移除全局键盘监听
     removeKeyListen () {
-      window.removeEventListener('keyup', this.autoFcousKey)
+      window.removeEventListener('keyup', this.autoFocusKey)
+    },
+    // 获取set组件传过来设置数据
+    getSetData (data) {
+      this.urls = data
+    },
+    // 获取change组件传过来imgurl
+    seaveImgurl (url) {
+      this.urls.backGroundUrl = url
+      window.localStorage.setItem('urls', JSON.stringify(this.urls))
     }
   },
   computed: {
@@ -415,10 +424,10 @@ export default {
     },
     // 用户背景图片自定义
     backGroundPath: function () {
-      if (!this.urls.backGroundUrl[0]) {
+      if (!this.urls.backGroundUrl) {
         return {}
       }
-      return { backgroundImage: 'url(' + this.urls.backGroundUrl[0] + ')' }
+      return { backgroundImage: 'url(' + this.urls.backGroundUrl + ')' }
     }
   },
   watch: {
@@ -426,7 +435,7 @@ export default {
     searchLogoActive: function () {
       window.localStorage.setItem('searchLogoActive', this.searchLogoActive)
     },
-    // 保存用户自定义设置
+    // 自动保存更改设置
     urls: function () {
       window.localStorage.setItem('urls', JSON.stringify(this.urls))
     },
@@ -590,7 +599,8 @@ top: 120px;
   margin-right: 5px;
   /* background-color: #cccccc; */
   border-radius: 20px;
-  transition: all 0.25s;
+  /* transition: property duration timing-function delay; */
+  transition: color 0.25s , border 0.25s ;
   cursor: pointer;
 }
 .searchTools li:hover {
