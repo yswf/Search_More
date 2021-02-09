@@ -74,11 +74,11 @@
         <li
           v-if="keyListActive === i"
           class="keyListActive"
-          @click.stop="keyListSearch(item.word)"
+          @click.stop="keyListSearch(item.word || item.style.title)"
         >
-          {{ item.word }}
+          {{ item.word || item.style.title}}
         </li>
-        <li v-else @click.stop="keyListSearch(item.word)">{{ item.word }}</li>
+        <li v-else @click.stop="keyListSearch(item.word || item.style.title)">{{ item.word || item.style.title}}</li>
       </ul>
     </div>
     <!-- 背景控制 -->
@@ -124,7 +124,12 @@ export default {
       // 默认配置
       urls: {},
       // 是否全局监听键盘事件
-      keyStatus: true
+      keyStatus: true,
+      // 背景图片链接
+      imagesInformation: {
+        url: '',
+        copyright: ''
+      }
     }
   },
   created () {
@@ -132,6 +137,7 @@ export default {
       window.localStorage.setItem('urls', JSON.stringify(defaultSet))
     }
     this.urls = JSON.parse(window.localStorage.getItem('urls'))
+    window.localStorage.getItem('imagesInformation') && (this.imagesInformation = JSON.parse(window.localStorage.getItem('imagesInformation')))
     this.searchLogoActive = window.localStorage.getItem('searchLogoActive') - 0
     this.audioUrl = this.urls.youdaoUrl + 'null'
   },
@@ -259,7 +265,7 @@ export default {
         this.$message({
           showClose: true,
           duration: 1000,
-          message: '没学过这种翻译语法，自创的？',
+          message: '您输入确定是个词么？',
           type: 'warning'
         })
         return
@@ -318,7 +324,7 @@ export default {
           this.keyListActive = this.getKeyList.length
         }
         this.keyListActive--
-        this.keyWorld = this.getKeyList[this.keyListActive].word
+        this.keyWorld = this.getKeyList[this.keyListActive].word || this.getKeyList[this.keyListActive].style.title
         // this.searchVague()
       }
 
@@ -328,7 +334,7 @@ export default {
           this.keyListActive = -1
         }
         this.keyListActive++
-        this.keyWorld = this.getKeyList[this.keyListActive].word
+        this.keyWorld = this.getKeyList[this.keyListActive].word || this.getKeyList[this.keyListActive].style.title
         // this.searchVague()
       }
       // delete 清空搜索框
@@ -338,6 +344,7 @@ export default {
     },
     // 联想词条搜索
     keyListSearch (q) {
+      console.log(q)
       this.keyWorld = q
       this.searchLogoActive === 0 && this.baidu()
       this.searchLogoActive === 1 && this.bing()
@@ -386,12 +393,15 @@ export default {
     },
     // 获取set组件传过来设置数据
     getSetData (data) {
-      this.urls = data
+      this.urls = data.urls
+      this.imagesInformation = {
+        url: data.backGroundUrl,
+        copyright: ''
+      }
     },
     // 获取change组件传过来imgurl
-    seaveImgurl (url) {
-      this.urls.backGroundUrl = url
-      window.localStorage.setItem('urls', JSON.stringify(this.urls))
+    seaveImgurl (images) {
+      this.imagesInformation = images
     }
   },
   computed: {
@@ -424,10 +434,10 @@ export default {
     },
     // 用户背景图片自定义
     backGroundPath: function () {
-      if (!this.urls.backGroundUrl) {
+      if (!this.imagesInformation.url) {
         return {}
       }
-      return { backgroundImage: 'url(' + this.urls.backGroundUrl + ')' }
+      return { backgroundImage: 'url(' + this.imagesInformation.url + ')' }
     }
   },
   watch: {
@@ -438,6 +448,9 @@ export default {
     // 自动保存更改设置
     urls: function () {
       window.localStorage.setItem('urls', JSON.stringify(this.urls))
+    },
+    imagesInformation: function () {
+      window.localStorage.setItem('imagesInformation', JSON.stringify(this.imagesInformation))
     },
     // 自动翻译
     transfromWorld: function () {

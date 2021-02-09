@@ -398,6 +398,7 @@ top: 90px;
   top: 66px;
   font-size: 14px;
   left: 155px;
+  color: rgb(255,255,255);
 }
 .cardType{
   width: 100%;

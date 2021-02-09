@@ -2,6 +2,14 @@
     <div class="change" @click.stop="">
          <span class="iconfont icon-left" @click="left"></span>
          <span class="iconfont icon-right" @click="right"></span>
+  <el-popover
+  v-if="imagesInformation.copyright"
+    placement="top-start"
+    width="200"
+    trigger="hover"
+    :content="imagesInformation.copyright">
+    <i class="el-icon-info" slot="reference"></i>
+  </el-popover>
     </div>
 </template>
 <script>
@@ -9,17 +17,23 @@ import { defaultSet } from '../partten'
 export default {
   data () {
     return {
-      imgPage: 0
+      imgPage: 0,
+      imagesInformation: {}
     }
+  },
+  created () {
+    if (!window.localStorage.getItem('imagesInformation')) {
+      return
+    }
+    this.imagesInformation = JSON.parse(window.localStorage.getItem('imagesInformation'))
   },
   methods: {
     left () {
       if (this.imgPage <= 0) {
-        this.imgPage = 7
+        this.imgPage = 8
       }
       this.imgPage--
       this.getimgUrl(this.imgPage)
-      this.$message.success('上一张壁纸')
     },
     right () {
       if (this.imgPage >= 7) {
@@ -27,7 +41,6 @@ export default {
       }
       this.imgPage++
       this.getimgUrl(this.imgPage)
-      this.$message.success('下一张壁纸')
     },
     // 获取图片
     async getimgUrl (n) {
@@ -38,7 +51,17 @@ export default {
           n: 1
         }
       })
-      this.$emit('seaveImgurl', 'https://cn.bing.com/' + res.images[0].url)
+      if (res.images[0].url) {
+        this.imagesInformation = {
+          copyright: res.images[0].copyright,
+          copyrightlink: res.images[0].copyrightlink,
+          url: 'https://cn.bing.com/' + res.images[0].url
+        }
+        this.$emit('seaveImgurl', this.imagesInformation)
+        // window.localStorage.setItem('imagesInformation', JSON.stringify(this.imagesInformation))
+      } else {
+        this.$message.error('切换失败！')
+      }
     }
   }
 }
@@ -59,6 +82,15 @@ export default {
      color: rgb(0, 0, 0);
     font-size: 30px;
     margin: 0 10px;
+    overflow: hidden;
     cursor: pointer;
+}
+.el-icon-info{
+   font-size: 18px;
+    margin-left: 5px;
+    cursor: pointer;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.45);
+    box-shadow: rgb(0 0 0 / 20%) 0 0 5px;
 }
 </style>

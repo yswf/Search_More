@@ -16,23 +16,28 @@
   <!-- 搜索引擎设置 -->
   <el-row>搜索引擎设置</el-row>
   <el-row>
-     <el-input placeholder="请以https开头，搜索词参数结尾如q=" v-model="urls.baiduUrl">
+     <el-input placeholder="https://xxx.cn?q=" v-model="urls.baiduUrl">
     <template slot="prepend">baidu</template>
   </el-input>
   </el-row>
   <el-row>
-     <el-input placeholder="请以https开头，搜索词参数结尾如q=" v-model="urls.bingUrl">
+     <el-input placeholder="https://xxx.cn?q=" v-model="urls.bingUrl">
     <template slot="prepend">bing</template>
   </el-input>
   </el-row>
   <el-row>
-     <el-input placeholder="请以https开头，搜索词参数结尾如q=" v-model="urls.googleUrl">
+     <el-input placeholder="https://xxx.cn?q=" v-model="urls.googleUrl">
     <template slot="prepend">google</template>
   </el-input>
   </el-row>
   <el-row>
-     <el-input placeholder="请以https开头，搜索词参数结尾如q=" v-model="urls.githubUrl">
+     <el-input placeholder="https://xxx.cn?q=" v-model="urls.githubUrl">
     <template slot="prepend">github</template>
+  </el-input>
+  </el-row>
+  <el-row>
+     <el-input placeholder="仅支持外链https://xxx" v-model="backGroundUrl">
+    <template slot="prepend">背景图片地址</template>
   </el-input>
   </el-row>
   <!-- 联系及项目地址 -->
@@ -83,7 +88,9 @@ export default {
       setDialogVisible: false,
       autoFocus: true,
       popoverVisible: false,
-      urls: {}
+      urls: {},
+      backGroundUrl: '',
+      setData: {}
     }
   },
   methods: {
@@ -96,6 +103,7 @@ export default {
     // 获取设置信息
     getsSet () {
       this.urls = JSON.parse(window.localStorage.getItem('urls'))
+      this.backGroundUrl = JSON.parse(window.localStorage.getItem('imagesInformation')).url
       this.setDialogVisible = true
     },
     // 重置初始化
@@ -107,7 +115,11 @@ export default {
     },
     // save保存设置
     saveSet () {
-      this.$emit('getSetData', this.urls)
+      this.setData = {
+        urls: this.urls,
+        backGroundUrl: this.backGroundUrl
+      }
+      this.$emit('getSetData', this.setData)
       this.fatherKeylisten()
       this.$message.success('保存成功！')
     }
@@ -129,12 +141,11 @@ export default {
     position: absolute;
     right: 10px;
     top: 10px;
-    color: rgba(255, 255, 255, 0.45);
+     color: rgba(17, 17, 17, 0.44);
     font-size: 30px;
      cursor: pointer;
 }
 .icon-set:hover{
-  color: rgba(17, 17, 17, 0.44);
    transform: scale(1.2);
 }
 .el-row{

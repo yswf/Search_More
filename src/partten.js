@@ -6,10 +6,9 @@ export const defaultSet = {
   githubUrl: 'https://github.com/search?q=',
   youdaoUrl: 'https://dict.youdao.com/dictvoice?type=0&audio=',
   // 备份 youdaoUrl: 'http://tts.youdao.com/fanyivoice?word=',
-  translationApi: 'https://api.yswf.xyz/test',
+  translationApi: 'https://m.yswf.xyz/test',
   quarkApi: 'https://m.yswf.xyz/api/quark_sug',
   bingApi: 'https://m.yswf.xyz/HPImageArchive.aspx',
-  backGroundUrl: '',
   autoFocus: true
   // https://cn.bing.com/th?id=OHR.ToledoIldefonso_ZH-CN4507206651_1920x1080.jpg&amp;rf=LaDigue_1920x1080.jpg&amp;pid=hp
   // baiduKeysUrl:
