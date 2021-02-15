@@ -38,6 +38,22 @@ min-width: 200px;
 .el-dialog::-webkit-scrollbar{
   display: none;
 }
+/* 图片加载失败 */
+.image-slot{
+  font-size: 30px;
+  text-align: center;
+    width: 135px;
+    height: 90px;
+    line-height: 90px;
+    background: #f5f7fa;
+    color: #909399;
+}
+.el-card__body{
+  height: 88px;
+}
+.copyright .el-card__body{
+  height: auto;
+}
 /* .el-dialog__footer {
   position: absolute;
   bottom: 0;

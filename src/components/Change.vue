@@ -1,8 +1,10 @@
 <template>
+    <div>
     <div class="change" @click.stop="">
          <span class="iconfont icon-left" @click="left"></span>
          <span class="iconfont icon-right" @click="right"></span>
-  <el-popover
+    </div>
+    <el-popover
   v-if="imagesInformation.copyright"
     placement="top-start"
     width="200"
@@ -55,10 +57,10 @@ export default {
         this.imagesInformation = {
           copyright: res.images[0].copyright,
           copyrightlink: res.images[0].copyrightlink,
-          url: 'https://cn.bing.com/' + res.images[0].url
+          url: 'https://cn.bing.com/' + res.images[0].url,
+          backGroundUrlStatus: true
         }
         this.$emit('seaveImgurl', this.imagesInformation)
-        // window.localStorage.setItem('imagesInformation', JSON.stringify(this.imagesInformation))
       } else {
         this.$message.error('切换失败！')
       }
@@ -86,6 +88,9 @@ export default {
     cursor: pointer;
 }
 .el-icon-info{
+  position:absolute;
+    bottom: 10px;
+    left: 10px;
    font-size: 18px;
     margin-left: 5px;
     cursor: pointer;

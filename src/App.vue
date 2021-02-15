@@ -82,7 +82,7 @@
       </ul>
     </div>
     <!-- 背景控制 -->
-    <change @seaveImgurl="seaveImgurl"></change>
+    <change @seaveImgurl="seaveImgurl" :class="changeNext"></change>
     <!-- 声音播放 -->
     <audio :src="audioUrl" ref="audioRef"></audio>
   </div>
@@ -93,7 +93,7 @@ import change from './components/Change'
 import setting from './components/Set'
 import card from './components/Card'
 // 引入常量
-import { defaultSet, chinese } from './partten'
+import { defaultSet, chinese, defaultImagesInformation, base64Image } from './partten'
 export default {
   components: { setting, change, card },
   data () {
@@ -128,8 +128,12 @@ export default {
       // 背景图片链接
       imagesInformation: {
         url: '',
-        copyright: ''
-      }
+        copyright: '',
+        // 是否启用网络图片
+        backGroundUrlStatus: true
+      },
+      // 上传图片
+      base64Image: ''
     }
   },
   created () {
@@ -137,9 +141,12 @@ export default {
       window.localStorage.setItem('urls', JSON.stringify(defaultSet))
     }
     this.urls = JSON.parse(window.localStorage.getItem('urls'))
-    window.localStorage.getItem('imagesInformation') && (this.imagesInformation = JSON.parse(window.localStorage.getItem('imagesInformation')))
     this.searchLogoActive = window.localStorage.getItem('searchLogoActive') - 0
     this.audioUrl = this.urls.youdaoUrl + 'null'
+    //
+    window.localStorage.getItem('imagesInformation') ? (this.imagesInformation = JSON.parse(window.localStorage.getItem('imagesInformation'))) : window.localStorage.setItem('imagesInformation', JSON.stringify(defaultImagesInformation))
+    //
+    window.localStorage.getItem('base64Image') ? (this.base64Image = window.localStorage.getItem('base64Image')) : window.localStorage.setItem('base64Image', base64Image)
   },
   mounted () {
     // 自动获取焦点
@@ -344,7 +351,6 @@ export default {
     },
     // 联想词条搜索
     keyListSearch (q) {
-      console.log(q)
       this.keyWorld = q
       this.searchLogoActive === 0 && this.baidu()
       this.searchLogoActive === 1 && this.bing()
@@ -396,8 +402,10 @@ export default {
       this.urls = data.urls
       this.imagesInformation = {
         url: data.backGroundUrl,
+        backGroundUrlStatus: data.backGroundUrlStatus,
         copyright: ''
       }
+      this.base64Image = data.base64Image
     },
     // 获取change组件传过来imgurl
     seaveImgurl (images) {
@@ -432,12 +440,21 @@ export default {
         show: this.isCard && this.keyWorld.trim() !== ''
       }
     },
+    // 上下一页按钮隐藏控制
+    changeNext: function () {
+      return {
+        changeNext: !this.imagesInformation.backGroundUrlStatus
+      }
+    },
     // 用户背景图片自定义
     backGroundPath: function () {
-      if (!this.imagesInformation.url) {
-        return {}
+      if (this.imagesInformation.url && this.imagesInformation.backGroundUrlStatus) {
+        return { backgroundImage: 'url(' + this.imagesInformation.url + ')' }
       }
-      return { backgroundImage: 'url(' + this.imagesInformation.url + ')' }
+      if (this.base64Image && !this.imagesInformation.backGroundUrlStatus) {
+        return { backgroundImage: 'url(' + this.base64Image + ')' }
+      }
+      return {}
     }
   },
   watch: {
@@ -451,6 +468,9 @@ export default {
     },
     imagesInformation: function () {
       window.localStorage.setItem('imagesInformation', JSON.stringify(this.imagesInformation))
+    },
+    base64Image: function () {
+      window.localStorage.setItem('base64Image', this.base64Image)
     },
     // 自动翻译
     transfromWorld: function () {
@@ -550,6 +570,9 @@ body .transfrom {
   height: 24px;
   line-height: 24px;
 }
+body .el-icon-document-copy{
+  right: 10px;
+  }
 body .cardBlock {
   display: none !important;
 }
@@ -674,6 +697,7 @@ top: 120px;
 }
 .keyworld li,
 .transfrom {
+  position: relative;
   height: 30px;
   padding-right: 10px;
   text-indent: 20px;
@@ -686,6 +710,9 @@ top: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.transfrom{
+  padding-right: 150px;
 }
 .keyworld li:hover,
 .transfrom:hover {
@@ -712,7 +739,8 @@ top: 120px;
   color: rgba(255, 255, 255, 0.9);
 }
 .icon-sound {
-  float: right;
+  position: absolute;
+  right: 0;
   padding-right: 20px;
 }
 .icon-sound:hover,.el-icon-document-copy:hover {
@@ -722,9 +750,14 @@ top: 120px;
 .cardBlock{
   display: none;
 }
+/* 上下一张壁纸隐藏 */
+.changeNext{
+  display: none;
+}
 /* 复制按钮 */
 .el-icon-document-copy{
-  float: right;
+  position: absolute;
+  right: 95px;
   line-height: 30px;
 }
 </style>

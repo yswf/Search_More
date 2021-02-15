@@ -15,5 +15,11 @@ export const defaultSet = {
   //     'https://www.baidu.com/sugrec?pre=1&p=3&ie=utf-8&json=1&prod=pc&from=pc_web&wd='
   // bingImgUrl: 'https://cn.bing.com/ImageResolution.aspx?w=375&h=667'
 }
+export const defaultImagesInformation = {
+  url: '',
+  copyright: '',
+  backGroundUrlStatus: true
+}
+export const base64Image = ''
 // 中文正则
 export const chinese = /^[\u4e00-\u9fa5]+$/
