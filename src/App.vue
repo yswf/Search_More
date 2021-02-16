@@ -1,7 +1,7 @@
 <template>
-  <div class="main" @click="closeSearch" :style="backGroundPath">
+  <div class="main" @click="closeSearch" :style="backGroundPath" @contextmenu.prevent="rightClick">
     <!-- 设置组件 -->
-    <setting @click.native.stop="removeKeyListen" @autoFocusKey="autoFocusKey" @getSetData='getSetData'></setting>
+    <setting @click.native.stop="removeKeyListen" @closeSetting="closeSetting" @getSetData='getSetData' :settingShow="settingStatus"></setting>
     <card :message="getKeyList[0]" :class="showCard"></card>
     <!-- 输入框 -->
     <input
@@ -107,6 +107,8 @@ export default {
       placeholder: 'Search',
       // 是否聚焦搜索框
       isFocus: false,
+      // 设置按钮是否显示
+      settingStatus: false,
       // 获取关键词
       getKeyList: [],
       // 关键词获取节流阀
@@ -130,7 +132,7 @@ export default {
         url: '',
         copyright: '',
         // 是否启用网络图片
-        backGroundUrlStatus: true
+        backGroundUrlStatus: false
       },
       // 上传图片
       base64Image: ''
@@ -183,6 +185,10 @@ export default {
       this.keyWorld = ''
       this.keyListActive = -1
       this.transfromHtml = ''
+    },
+    // 右击打开设置
+    rightClick () {
+      this.settingStatus = true
     },
     baidu () {
       this.searchLogoActive = 0
@@ -396,6 +402,12 @@ export default {
     // 移除全局键盘监听
     removeKeyListen () {
       window.removeEventListener('keyup', this.autoFocusKey)
+    },
+    // 关闭设置框
+    closeSetting () {
+      window.addEventListener('keyup', this.autoFocusKey)
+      this.settingStatus = false
+      this.autoFocusKey()
     },
     // 获取set组件传过来设置数据
     getSetData (data) {

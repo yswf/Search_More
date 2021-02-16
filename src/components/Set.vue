@@ -1,6 +1,6 @@
 <template>
     <div class="hidden-md-and-down">
-    <span class="iconfont icon-set" @click="getsSet"></span>
+    <span class="iconfont icon-set" @click="getsSet" style="display:none"></span>
     <!-- 设置页面 -->
   <el-dialog
   title="相关设置"
@@ -49,9 +49,7 @@
        <!-- 要将父布局的position设置为relative，父布局将无法包裹input -->
     <div style="position: relative;">
         <!--设置input的position为absolute，使其不按文档流排版，并设置其包裹整个布局 -->
-        <!-- 设置opactity为0，使input变透明 -->
-        <!-- 只接受jpg，gif和png格式 -->
-        <input type="file" accept="image/gif, image/jpg, image/png"  @change="changeCoverImg($event)" ref="inputRef"/>
+        <input type="file" accept="image/*"  @change="changeCoverImg($event)" ref="inputRef"/>
         <!-- 自定义按钮效果 -->
         <span>请选择喜爱的图像设为壁纸,建议图像尺寸：1920×1080 或更高</span>
         <el-button type="primary" size="medium" round @click="selectImg" :disabled="!localBackGroundStatus">选择 <i class="el-icon-folder-opened"></i></el-button>
@@ -122,6 +120,12 @@
 </template>
 <script>
 export default {
+  props: {
+    settingShow: {
+      type: Boolean,
+      default: false
+    }
+  },
   data () {
     return {
       setDialogVisible: false,
@@ -147,11 +151,19 @@ export default {
     }
   },
   methods: {
-    // 关闭设置框获取焦点
+    // 关闭设置
     fatherKeylisten () {
+      this.urls = {}
+      this.backGroundUrl = ''
+      this.setData = {}
+      this.coverImg = ''
       this.popoverVisible = false
       this.setDialogVisible = false
-      this.$emit('autoFocusKey')
+      this.$emit('closeSetting')
+    },
+    // 点击其他关闭清空设置
+    handleClose () {
+      this.fatherKeylisten()
     },
     // 获取设置信息
     getsSet () {
@@ -183,6 +195,10 @@ export default {
     // 本地图片保存
     changeCoverImg (e) {
       const file = e.target.files[0]
+      // 还有其他东西要存所以不是4194304
+      if (file.size > 4000000) {
+        return this.$message.error('超过4M请选用网络图片')
+      }
       const reader = new FileReader()
       const that = this
       reader.readAsDataURL(file)
@@ -193,14 +209,8 @@ export default {
     // 选择图片
     selectImg () {
       this.$refs.inputRef.click()
-    },
-    // 关闭清空设置
-    handleClose () {
-      this.urls = {}
-      this.backGroundUrl = ''
-      this.setData = {}
-      this.coverImg = ''
     }
+
     // 设置为主页
     // setHomepage () {
 
@@ -213,6 +223,9 @@ export default {
     },
     localBackGroundStatus: function () {
       this.backGroundUrlStatus = !this.localBackGroundStatus
+    },
+    settingShow: function () {
+      this.settingShow ? this.getsSet() : this.fatherKeylisten()
     }
   }
 }
@@ -221,6 +234,9 @@ export default {
 @media (max-width: 767px) {
   body .iconfont{
      font-size: 20px ;
+  }
+  .icon-set{
+    display: inline !important;
   }
 }
 .icon-set{

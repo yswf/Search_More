@@ -18,7 +18,7 @@ export const defaultSet = {
 export const defaultImagesInformation = {
   url: '',
   copyright: '',
-  backGroundUrlStatus: true
+  backGroundUrlStatus: false
 }
 export const base64Image = ''
 // 中文正则
