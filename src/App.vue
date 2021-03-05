@@ -83,6 +83,9 @@
     </div>
     <!-- 背景控制 -->
     <change @seaveImgurl="seaveImgurl" :class="changeNext"></change>
+    <!-- 遮蔽层 -->
+    <div class="mkg" :style="mkgCss">
+    </div>
     <!-- 声音播放 -->
     <audio :src="audioUrl" ref="audioRef"></audio>
   </div>
@@ -135,20 +138,28 @@ export default {
         backGroundUrlStatus: false
       },
       // 上传图片
-      base64Image: ''
+      base64Image: '',
+      // 遮蔽设置
+      mkgSetting: {
+        mkgStatus: false,
+        mkgValue: 0
+      }
     }
   },
   created () {
+    // 网站类信息
     if (!window.localStorage.getItem('urls')) {
       window.localStorage.setItem('urls', JSON.stringify(defaultSet))
     }
     this.urls = JSON.parse(window.localStorage.getItem('urls'))
     this.searchLogoActive = window.localStorage.getItem('searchLogoActive') - 0
     this.audioUrl = this.urls.youdaoUrl + 'null'
-    //
+    // 必应图片信息
     window.localStorage.getItem('imagesInformation') ? (this.imagesInformation = JSON.parse(window.localStorage.getItem('imagesInformation'))) : window.localStorage.setItem('imagesInformation', JSON.stringify(defaultImagesInformation))
-    //
+    // 用户上传图片信息
     window.localStorage.getItem('base64Image') ? (this.base64Image = window.localStorage.getItem('base64Image')) : window.localStorage.setItem('base64Image', base64Image)
+    // 遮蔽层配置
+    window.localStorage.getItem('mkgSetting') ? (this.mkgSetting = JSON.parse(window.localStorage.getItem('mkgSetting'))) : window.localStorage.setItem('mkgSetting', JSON.stringify(this.mkgSetting))
   },
   mounted () {
     // 自动获取焦点
@@ -418,6 +429,10 @@ export default {
         copyright: ''
       }
       this.base64Image = data.base64Image
+      this.mkgSetting = {
+        mkgStatus: data.mkgStatus,
+        mkgValue: data.mkgValue
+      }
     },
     // 获取change组件传过来imgurl
     seaveImgurl (images) {
@@ -467,6 +482,15 @@ export default {
         return { backgroundImage: 'url(' + this.base64Image + ')' }
       }
       return {}
+    },
+    // 遮蔽层配置
+    mkgCss: function () {
+      if (this.mkgSetting.mkgStatus && this.isFocus) {
+        return {
+          background: 'rgba(0, 0, 0, ' + this.mkgSetting.mkgValue / 100 + ')'
+        }
+      }
+      return {}
     }
   },
   watch: {
@@ -483,6 +507,9 @@ export default {
     },
     base64Image: function () {
       window.localStorage.setItem('base64Image', this.base64Image)
+    },
+    mkgSetting: function () {
+      window.localStorage.setItem('mkgSetting', JSON.stringify(this.mkgSetting))
     },
     // 自动翻译
     transfromWorld: function () {
@@ -539,6 +566,13 @@ body .main {
     background: url("https://cn.bing.com/ImageResolution.aspx?w=768&h=1024")
       no-repeat;
   }
+}
+/* 显示所有信息最小屏幕宽 */
+@media (max-width: 705px){
+    .main {
+    background: url("https://cn.bing.com/ImageResolution.aspx?w=768&h=1024")
+      no-repeat;
+  }
 /* input输入框 */
 body .default {
   top: 80px;
@@ -575,7 +609,21 @@ body .keyworld {
   left: 50%;
   width: 280px;
   height: 180px;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+body .keyworld::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 5px;
+}
+body .keyworld::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.35);
+  /* 滚动条的颜色 */
+  background-color:rgba(255,255,255,0.35);
+ }
 body .keyworld li,
 body .transfrom {
   font-size: 14px;
@@ -600,20 +648,26 @@ body .icon-sound{
       no-repeat;
   }
 }
-/* .mkg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  -webkit-backdrop-filter: blur(30px);
-  backdrop-filter: blur(30px);
-   transition: all 0.25s;
-} */
+.mkg {
+  position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    /* 毛玻璃效果，兼容不好 */
+    /* -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    transform: scale(1.1);
+    transition: opacity 1s, transform .25s, filter .25s; */
+    z-index: -99;
+}
 .searchTools {
   display: none;
   padding: 0;
   margin: 0;
   position: absolute;
   left: 50%;
+  top: 265px;
   transform: translateX(-50%);
   animation: searchOptBox .25s forwards ease;
 }
@@ -677,6 +731,7 @@ top: 120px;
   backdrop-filter: blur(10px);
   transition: color 0.25s, background-color 0.25s, box-shadow 0.25s, left 0.25s,
     opacity 0.25s, top 0.25s, width 0.25s;
+  z-index: 2;
 }
 .default:hover {
   width: 530px;
@@ -706,6 +761,7 @@ top: 120px;
   border-radius: 15px;
   transition: all 0.25s;
   overflow: hidden;
+  z-index: 2;
 }
 .keyworld li,
 .transfrom {

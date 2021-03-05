@@ -79,6 +79,7 @@ export default {
     position:absolute;
     bottom: 10px;
     right: 10px;
+    z-index: 2;
 }
 .iconfont{
      color: rgb(0, 0, 0);

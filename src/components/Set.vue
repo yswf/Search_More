@@ -15,6 +15,21 @@
     <el-col :span="20">自动聚焦到搜索栏</el-col>
     <el-col :span="4"><el-switch v-model="urls.autoFocus"></el-switch></el-col>
   </el-row>
+  <!-- 遮蔽层 -->
+  <el-row>
+    <el-col :span="20">是否开启遮蔽层 (建议25左右) </el-col>
+    <el-col :span="4"><el-switch v-model="mkgStatus"></el-switch></el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="10">遮蔽层参数</el-col>
+    <el-col :span="10"><el-slider
+      v-model="mkgValue"
+      input-size="mini"
+      :disabled="!mkgStatus"
+    >
+    <el-col :span="4"></el-col>
+    </el-slider></el-col>
+  </el-row>
   <!-- 搜索引擎设置 -->
   <el-divider> <i class="el-icon-search"></i> 搜索引擎设置</el-divider>
   <el-row>
@@ -68,7 +83,30 @@
   </el-row>
    <el-card class="copyright">
      <el-collapse >
-  <el-collapse-item title="版权信息" name="1">
+  <el-collapse-item title="快捷操作" name="1">
+     <el-row>
+      本页面含有很多快捷操作(PC端)
+     </el-row>
+     <el-row>
+      1.自动聚焦到搜索框：打开网页时自动聚焦输入框（可以在上面关闭），关闭时按任意键也可以聚焦；
+     </el-row>
+     <el-row>
+       2.搜索关键词后可通过上下切换关键词，左右切换搜索引擎，双击(或delete键)清空输入；
+     </el-row>
+     <el-row>
+       3.输入关键词可以实时翻译，支持有道翻译所有语种，点击翻译阅读，输入中英都只阅读英文(只支持阅读英文)；
+     </el-row>
+      <el-row>
+       4.背景图片可以复制粘贴过来图片网址(推荐)，也可以上传本地，但是上传其实也base64编码存本地并不会缓存；
+     </el-row>
+      <el-row>
+       5.当网络图片开关打开时，主页右下角会出现两个切换按钮可以切换最近一星期必应壁纸；
+     </el-row>
+     <el-row>
+       6.可能有人没用过夸克浏览器，你试试搜索天气、名人、名书、电影、歌曲、学校、作文、1+1...你会发现新世界。
+     </el-row>
+  </el-collapse-item>
+  <el-collapse-item title="版权信息" name="2">
      <el-row>
        本页面样式参考<strong>青柠起始页</strong>,搜索api为<strong>夸克</strong>神马搜索,背景图片为<strong>必应壁纸</strong>，翻译api为<strong>有道智云</strong>翻译。
      </el-row>
@@ -80,7 +118,7 @@
      </el-row>
      <el-row>请勿将本网站开源代码用于商用，仅作学习交流使用，欢迎大家一起完善项目！</el-row>
   </el-collapse-item>
-  <el-collapse-item title="相关网站" name="2">
+  <el-collapse-item title="相关网站" name="3">
     <el-row>
     <el-col :span="6"><el-link type="success" href="https://a.maorx.cn/" target="_blank" :underline="false">青柠起始页</el-link></el-col>
     <el-col :span="6"><el-link type="success" href="https://www.myquark.cn/" target="_blank" :underline="false">夸克浏览器</el-link></el-col>
@@ -136,18 +174,22 @@ export default {
       setData: {},
       coverImg: '',
       backGroundUrlStatus: true,
-      localBackGroundStatus: false
+      localBackGroundStatus: false,
+      mkgStatus: false,
+      mkgValue: 25
     }
   },
   created () {
     if (!window.localStorage.getItem('searchLogoActive')) {
       const h = this.$createElement
       this.$notify({
-        title: 'SearchMore',
-        message: h('i', { style: 'color: teal' }, '清爽简洁，更专注于搜索！'),
+        title: '欢迎您首次使用',
+        message: h('p', { style: 'color: rgb(144,147,153)' }, '本页面隐藏了很多快捷操作: 鼠标右键唤起自定义设置和介绍; 你会发现新大陆！. '),
         position: 'bottom-right',
-        duration: 3000
+        iconClass: 'el-icon-ship',
+        duration: 0
       })
+      window.localStorage.setItem('searchLogoActive', 0)
     }
   },
   methods: {
@@ -168,8 +210,12 @@ export default {
     // 获取设置信息
     getsSet () {
       this.urls = JSON.parse(window.localStorage.getItem('urls'))
-      this.backGroundUrl = JSON.parse(window.localStorage.getItem('imagesInformation')).url
-      this.backGroundUrlStatus = JSON.parse(window.localStorage.getItem('imagesInformation')).backGroundUrlStatus
+      const imagesInformation = JSON.parse(window.localStorage.getItem('imagesInformation'))
+      this.backGroundUrl = imagesInformation.url
+      this.backGroundUrlStatus = imagesInformation.backGroundUrlStatus
+      const mkgSetting = JSON.parse(window.localStorage.getItem('mkgSetting'))
+      this.mkgValue = mkgSetting.mkgValue
+      this.mkgStatus = mkgSetting.mkgStatus
       this.coverImg = window.localStorage.getItem('base64Image')
       this.setDialogVisible = true
     },
@@ -186,7 +232,10 @@ export default {
         urls: this.urls,
         backGroundUrl: this.backGroundUrl,
         backGroundUrlStatus: this.backGroundUrlStatus,
-        base64Image: this.coverImg
+        base64Image: this.coverImg,
+        mkgStatus: this.mkgStatus,
+        mkgValue: this.mkgValue
+
       }
       this.$emit('getSetData', this.setData)
       this.fatherKeylisten()
@@ -231,12 +280,17 @@ export default {
 }
 </script>
 <style scoped>
-@media (max-width: 767px) {
+@media (max-width: 979px) {
   body .iconfont{
-     font-size: 20px ;
+     font-size: 25px ;
   }
   .icon-set{
     display: inline !important;
+  }
+}
+@media (max-width: 767px) {
+  body .iconfont{
+     font-size: 20px ;
   }
 }
 .icon-set{
@@ -246,6 +300,7 @@ export default {
      color: rgba(17, 17, 17, 0.44);
     font-size: 30px;
      cursor: pointer;
+     z-index: 2;
 }
 .icon-set:hover{
    transform: scale(1.2);
