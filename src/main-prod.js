@@ -8,6 +8,7 @@ import './assets/font/iconfont.css'
 // 导入NProgress包和css
 import NProgress from 'nprogress'
 // 配置axios
+axios.defaults.baseURL = process.env.VUE_APP_API_URL || ''
 axios.defaults.timeout = 3000
 axios.interceptors.request.use(config => {
   NProgress.start()

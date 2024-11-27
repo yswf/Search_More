@@ -10,7 +10,7 @@ import './assets/font/iconfont.css'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 // 配置axios
-// axios.defaults.baseURL = 'http://yswf.xyz:64570'
+axios.defaults.baseURL = process.env.VUE_APP_API_URL || ''
 axios.defaults.retry = 4
 axios.defaults.retryDelay = 1000
 axios.interceptors.request.use(config => {
